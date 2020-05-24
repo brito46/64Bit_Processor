@@ -1,0 +1,30 @@
+//**Instruction Memory**
+module InstructionMemory(
+input Reset,
+input [31:0] PC, ////the processor first fetches the instruction from the //address stored in the PC
+output reg [31:0] Instruction,
+output reg [10:0] OP_Field
+);
+integer i;
+always @ (*)
+	begin
+    	if (!Reset)
+        	begin 	
+        	for(i = 0; i <= 24; i = i +4)                	
+        	Instruction[i] <= 32'hFFFFFFFF;
+        	end
+	else
+	begin
+    	case (PC)
+    	32'h0: Instruction = 32'b11111000010000010100000011100110; // LDUR x6, //[x7, #20]
+    	32'h4: Instruction = 32'b11111000000000010100000010100100; //STUR //x4,[x5, #20]
+    	32'h8: Instruction = 32'b10001011000000010000000001000011; //ADD X3, X2, //X1
+    	32'hC: Instruction = 32'b11001011000010100000000110001101; //SUB X13, //x12, x10
+    	32'h10: Instruction = 32'b10101010000011010000000111101110; // ORR X14, //X15, X16
+    	32'h14: Instruction = 32'b1011010000000000000000100010010; //CBZ x20, #8
+    	32'h18: Instruction = 32'b10001010000101010000001011010001; // AND x17, //x22, x21
+    	endcase      	
+    	OP_Field = Instruction[31:21];  //OP_Field value is acquired
+     	end
+	end
+endmodule

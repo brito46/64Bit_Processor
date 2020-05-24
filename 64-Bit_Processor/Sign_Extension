@@ -1,0 +1,25 @@
+//**Sign Extension File**
+`timescale 1ns / 1ps
+module SE(
+input Reset,
+input [10:0] OP_Field,
+input [31:0] Instruction,
+output reg [63:0] Instruction_SE
+);
+always @ (*)
+	begin
+	if(!Reset)
+               	begin
+                    	Instruction_SE = 0;
+                	end
+    	case(OP_Field)
+        11'b11111000010: Instruction_SE = $signed(Instruction[20:12]); // LDUR
+        11'b11111000000: Instruction_SE = $signed(Instruction[20:12]); // STUR
+        	11'b10001011000: Instruction_SE = 64'bx; //R-types bypass this
+        	11'b11001011000: Instruction_SE = 64'bx;  
+        	11'b10001010000: Instruction_SE = 64'bx;  
+        	11'b10101010000: Instruction_SE = 64'bx;  
+        	default: Instruction_SE = $signed(Instruction[23:5]); //CBZ
+    	endcase
+	end
+endmodule

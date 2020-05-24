@@ -1,0 +1,79 @@
+//**Datapath File**
+`timescale 1ns / 1ps
+module DataPath(
+input CLK,
+input Reset,
+output wire [10:0]OP_Field,
+output wire [31:0]PC,
+output wire [31:0] Instruction,
+output wire [63:0] B,
+output wire [63:0] Y,
+output wire Mem_Write,
+output wire Mem_Read,
+output wire [63:0] WriteData,
+output wire [63:0] A,
+output wire Branch,
+output wire [3:0] ALU_Control,
+output wire [4:0] WriteRegister,
+output wire ALU_SRC,
+output wire [63:0] Instruction_SE,
+output wire [1:0] ALU_OP
+);
+ wire Reg_Write;
+ wire Mem_To_Reg;
+ wire Reg2Loc;
+ wire Zero;
+Controller CallingController(
+.Reset(Reset),
+.OP_Field(OP_Field), 	
+.ALU_OP(ALU_OP),
+.Branch(Branch),
+.Mem_Write(Mem_Write),
+.Mem_Read(Mem_Read),
+.Reg_Write(Reg_Write),
+.Mem_To_Reg(Mem_To_Reg),
+.ALU_SRC(ALU_SRC),
+.Reg2Loc(Reg2Loc)
+);
+ALU_Controller CallingALU_Controller( // ALU_Control
+.ALU_OP(ALU_OP),
+.Reset(Reset),
+.OP_Field(OP_Field),
+.ALU_Control(ALU_Control)
+);
+ALU CallingALU(
+.Reset(Reset),
+.A(A),	
+.B(B),	
+.ALU_Control(ALU_Control),
+.Zero(Zero),
+.Y(Y)
+);
+ProgramCounter CallingPC(
+.Instruction_SE(Instruction_SE),
+.CLK(CLK),  	//inside the parentheses are the local variables
+.Reset(Reset),
+.PC(PC),  
+.Branch(Branch),
+.Zero(Zero)
+);
+SE CallingSE(
+.Reset(Reset),
+.OP_Field(OP_Field),
+.Instruction(Instruction), //this comes from register file
+.Instruction_SE(Instruction_SE)
+);
+RegisterFile CallingRegisterFile(
+.Reset(Reset),
+.CLK(CLK),
+.WriteData(WriteData),
+.Instruction(Instruction),
+.ALU_SRC(ALU_SRC),
+.Mem_Write(Mem_Write),
+.Mem_Read(Mem_Read),
+.Branch(Branch),
+.A(A),
+.B(B),
+.WriteRegister(WriteRegister)
+);
+endmodule

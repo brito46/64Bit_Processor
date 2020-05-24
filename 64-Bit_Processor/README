@@ -1,0 +1,3 @@
+**README**
+
+This is how to design a 64-bit ARM processor in verilog. The test bench showed the functionality of the instruction expressed in the ALU. Instruction memory and data memory were separated from the datapath and instantiated in the test bench. 

@@ -1,0 +1,52 @@
+//**ALU File**
+`timescale 1ns / 1ps
+module ALU(
+	input Reset,
+	input [63:0] A, //read data1
+	input [63:0] B,  //read data2
+	input [3:0] ALU_Control,
+	input ALU_SRC,
+	input [63:0] Instruction_SE, //this will go in place of B for some cases
+	output reg [63:0] Y,
+	output reg Zero
+	);
+always @ (*)
+    	begin
+    	if(!Reset) //active low
+    	begin
+         	Zero = 0;  
+         	Y =0;
+   	end
+        	if(ALU_SRC == 1)// meaning it’ll be ldur or stur
+         	begin
+             	//the ALU_Result is comparing SE and A now
+             	case (ALU_Control)
+                  	4'b0000: Y = A&Instruction_SE; // AND
+                  	4'b0001: Y = A|Instruction_SE; // ORR
+                	4'b0010: Y = A+Instruction_SE; // ADD
+                 	4'b0110: Y = A-Instruction_SE; // SUB
+                 	4'b0111: Y = B; // this is accounting for CBZ
+            	default: Y = Y; //for the dont care values
+             	endcase
+         	end
+     	
+Begin              //when it is an R-type
+        	case (ALU_Control)
+              	4'b0000: Y = A&B; // AND
+              	4'b0001: Y = A|B; // ORR
+              	4'b0010: Y = A+B; // ADD
+              	4'b0110: Y = A-B; // SUB
+              	4'b0111: Y = B; // this is accounting for CBZ
+              	default: Y = Y; //for the dont care values
+     	endcase
+end	
+    	end
+	always@(*) //sensitivity list of the result
+    	begin
+        	case (Y)
+                	5'b00000: Zero = 1'b1;//if the ALU result is zero
+                	default: Zero = 1'b0;
+            	endcase
+        	end	
+    	
+endmodule

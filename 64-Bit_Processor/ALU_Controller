@@ -1,0 +1,29 @@
+//**ALU Controller File**
+`timescale 1ns / 1ps
+module ALU_Controller(
+input Reset,
+input[1:0] ALU_OP,
+input [10:0] OP_Field,
+output reg [3:0] ALU_Control
+);
+always @ (*)
+	begin
+           	if(!Reset)
+           	begin
+                	ALU_Control = 0;
+            	end
+    	case (ALU_OP)
+        	2'b00: ALU_Control = 4'b0010; //ldur or stur
+        	2'b01: ALU_Control = 4'b0111; //cbz
+        	2'b10:    //R-types
+        	begin
+               	case(OP_Field)
+               	11'b10001011000: ALU_Control = 4'b0010;
+               	11'b11001011000: ALU_Control = 4'b0110;
+               	11'b10001010000: ALU_Control = 4'b0000;
+               	11'b10101010000: ALU_Control = 4'b0001;
+             	endcase
+               	end
+    	endcase
+	end
+endmodule

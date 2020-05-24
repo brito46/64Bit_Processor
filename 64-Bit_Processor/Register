@@ -1,0 +1,55 @@
+//**Register File**
+module RegisterFile(
+input [63:0] WriteData, //it gets this from DM
+input CLK,
+input Reset,
+input [31:0] Instruction,
+input ALU_SRC,
+input Mem_Write,
+input Mem_Read,
+input Branch,
+output reg [63:0] A,      	//read data1
+output reg [63:0] B,     	//read data2
+output reg [4:0] WriteRegister  //assign this the value of writeData
+);
+integer i;
+reg [63:0] registerContent [31:0]; //creating 32 registers
+always@(*)
+begin
+if(!Reset)
+           	begin
+                	A = 0;
+                	B=0;
+                	WriteRegister = 0;
+            	end
+for(i = 0; i <32; i = i +1)
+	begin
+    	registerContent[i] = i;   	//giving content to the 32 registers
+	end
+	registerContent[31] = 0; //because of XZR
+
+if( Branch == 0 && Mem_Write == 0 && Mem_Read == 1 && ALU_SRC == 1)  	//LDUR
+begin
+	A = registerContent[Instruction[9:5]];
+	WriteRegister = Instruction[4:0];
+	registerContent[WriteRegister] = WriteData; //updating register content after cycle
+end
+else if ( Branch == 0 && Mem_Write == 1 && Mem_Read == 0) // STUR
+	begin
+    	A = registerContent[Instruction[9:5]];
+    	B = registerContent[Instruction[4:0]];
+    	WriteRegister = 5'bxxxxx;
+end
+else if (Branch == 0 && Mem_Write == 0 && Mem_Read == 0) //R-Types
+	begin	
+    	A = registerContent[Instruction[9:5]];
+    	B = registerContent[Instruction[20:16]];
+    	WriteRegister = Instruction[4:0];
+    	registerContent[WriteRegister] = WriteData; //updating register
+end
+Else   //cbz
+	begin
+    	B = registerContent[Instruction[4:0]];
+	end
+end
+endmodule

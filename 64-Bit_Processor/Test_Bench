@@ -1,0 +1,73 @@
+//**Test Bench**
+`timescale 1ns / 1ps
+module TB( );
+reg CLK;
+reg Reset;
+//reg [31:0] PC_Old; // call pc module to wire this value
+wire [1:0] ALU_OP;
+wire Mem_Write;
+wire Mem_Read;
+wire [10:0] OP_Field;
+wire [63:0] A;
+wire [63:0] B;
+wire [63:0] Y;
+wire [31:0] PC;
+wire [63:0] WriteData;
+wire [31:0] Instruction;
+wire [63:0] ReadData;
+wire Branch;
+wire [3:0]ALU_Control;
+wire [4:0] WriteRegister;
+wire ALU_SRC;
+wire [63:0] Instruction_SE;
+
+	
+DataPath uut(
+.Reset(Reset),
+.CLK(CLK),
+.OP_Field(OP_Field),
+.PC(PC),
+.Instruction(Instruction),
+.B(B),
+.A(A),
+.Y(Y),
+.Mem_Write(Mem_Write),
+.Mem_Read(Mem_Read),
+.WriteData(WriteData),
+.ALU_OP(ALU_OP),
+.ALU_Control(ALU_Control),
+.WriteRegister(WriteRegister),
+.ALU_SRC(ALU_SRC),
+.Instruction_SE(Instruction_SE),
+.Branch(Branch)
+);
+InstructionMemory CallingIM(
+.Reset(Reset),
+.PC(PC), ////the processor first fetches the instruction from the address stored in the PC
+.Instruction(Instruction),
+.OP_Field(OP_Field)
+);
+DataMemory CallingDM(
+.CLK(CLK),
+.Y(Y), 	// the result after the ALU goes inside DM
+.B(B),  //readReg2
+.Mem_Read(Mem_Read),
+.Mem_Write(Mem_Write),
+.ReadData(ReadData), 	//reads the content stored at the address of Y
+.WriteData(WriteData)
+);
+//Setting Clock
+initial forever
+	begin
+    	CLK = 0;
+    	#10;
+    	CLK = 1;
+    	#10;
+	end
+//Setting RESET	
+initial
+	begin
+    	Reset = 0;
+    	#20;
+    	Reset = 1;
+	end

@@ -1,0 +1,38 @@
+//**Data Memory**
+module DataMemory(
+//the alu result and read_data is 64 bits
+input CLK,
+input [63:0] Y, 	// the result after the ALU goes inside DM
+input[63:0] B,  //readReg2
+input Mem_Read,
+input Mem_Write,
+output reg [63:0] ReadData, 	//reads the content stored at the address of Y
+output reg [63:0] WriteData //the mux selector value affects this value
+);
+//we read on combo and write in clk
+integer j;
+reg [63:0] DataContent[99:0]; //making 100 registers that are 64 bits in size
+always@(posedge CLK)
+begin
+for(j = 0; j < 100; j = j+1)
+begin
+DataContent[j] <= j;  //creating content of 100 amount of addresses
+end
+if(Mem_Read == 1)
+begin
+	ReadData <= DataContent[Y];
+	WriteData <= ReadData; //this is MuxSelctor 1 for MemToReg Mux
+end
+else if(Mem_Write == 1) //stur
+begin
+DataContent[Y] <= B;  //this is the write data in the data memory
+WriteData <= B;
+//write data in DM means we override the content of that addr. With content //of reg2; STUR never interacts with the MemToReg Mux
+end
+else
+	begin
+	WriteData <= Y; //bypassing the DM; muxSelector 0
+	ReadData <= 63'bx;
+	end
+end
+endmodule

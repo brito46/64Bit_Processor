@@ -1,0 +1,112 @@
+// **Controller File**
+`timescale 1ns / 1ps
+module Controller(
+input Reset,
+input [10:0] OP_Field,
+output reg [1:0] ALU_OP,
+output reg Branch,
+output reg Mem_Write,
+output reg Mem_Read,
+output reg Reg_Write,
+output reg Mem_To_Reg,
+output reg ALU_SRC,
+output reg Reg2Loc
+);
+always @ (*)
+	begin
+    	begin
+        	if(!Reset)  //active low
+        	begin
+             	ALU_OP = 0;  
+             	Branch =0;
+             	Mem_Write = 0;
+             	Mem_Read = 0;
+             	Reg_Write = 0;
+             	Mem_To_Reg = 0;
+             	ALU_SRC = 0;
+             	Reg2Loc = 0;
+        	end
+       	end
+    	case(OP_Field)
+    	11'b11111000000:  // STUR Function
+    	begin
+      Branch = 1'b0;
+    	Mem_Write = 1'b1;
+    	Mem_Read = 1'b0;
+    	Reg_Write =  1'b0;
+    	Mem_To_Reg = 1'bx;
+    	ALU_SRC = 1'b1;
+    	Reg2Loc = 1'b1;
+    	ALU_OP = 2'b00;
+    	end
+    	
+    	11'b11111000010: // LDUR Function
+    	begin
+    	Branch = 1'b0;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b1;
+    	Reg_Write =  1'b1;
+    	Mem_To_Reg = 1'b1;
+    	ALU_SRC = 1'b1;
+    	Reg2Loc = 1'bx;
+    	ALU_OP = 2'b00;
+    	end
+    	
+    	default: // CBZ Function
+    	begin
+      Branch = 1'b1;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b0;
+    	Reg_Write = 1'b0;
+    	Mem_To_Reg = 1'bx;
+    	ALU_SRC = 1'b0;
+    	Reg2Loc = 1'b1;
+    	ALU_OP = 2'b01;
+    	end
+    	11'b10001011000: // ADD Function
+    	begin
+      Branch = 1'b0;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b0;
+    	Reg_Write = 1'b1;
+    	Mem_To_Reg = 1'b0;
+    	ALU_SRC = 1'b0;
+    	Reg2Loc = 1'b0;
+    	ALU_OP = 2'b10;
+    	end
+    	11'b11001011000: // SUB Function
+    	begin
+      Branch = 1'b0;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b0;
+    	Reg_Write = 1'b1;
+    	Mem_To_Reg = 1'b0;
+    	ALU_SRC = 1'b0;
+    	Reg2Loc = 1'b0;
+    	ALU_OP = 2'b10;
+    	end
+    	11'b10001010000: // AND Function
+    	begin
+    	Branch = 1'b0;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b0;
+    	Reg_Write = 1'b1;
+    	Mem_To_Reg = 1'b0;
+    	ALU_SRC = 1'b0;
+    	Reg2Loc = 1'b0;
+      ALU_OP = 2'b10;
+    	end
+    	11'b10101010000: // ORR Function
+    	begin
+    	Branch = 1'b0;
+    	Mem_Write = 1'b0;
+    	Mem_Read = 1'b0;
+    	Reg_Write = 1'b1;
+    	Mem_To_Reg = 1'b0;
+    	ALU_SRC = 1'b0;
+    	Reg2Loc = 1'b0;
+    	ALU_OP = 2'b10;
+    	end
+endcase
+end
+endmodule

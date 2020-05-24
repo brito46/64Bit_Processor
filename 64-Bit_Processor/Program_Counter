@@ -1,0 +1,46 @@
+//**Program Counter File**
+`timescale 1ns / 1ps
+module ProgramCounter(
+input [63:0] Instruction_SE, 
+input CLK,
+input Reset,
+output reg [31:0] PC, //this new PC value will be read by the Instruction Mem Register
+input Branch,
+input Zero
+);
+always@(posedge CLK)
+	begin
+	PC=0;   //this varied depending on what instruction we wanted to test
+    	if(!Reset)
+         	PC = 0;  //active low
+    	else
+    	begin
+        	if(Branch == 1 && Zero ==1)
+            	PC = PC  + (Instruction_SE * 4); //branch mux selector 1
+        	else PC = PC + 4;  // branch mux selector 0
+        	end
+    	end
+endmodule
+Program Counter
+`timescale 1ns / 1ps
+module ProgramCounter(
+input [63:0] Instruction_SE, 
+input CLK,
+input Reset,
+output reg [31:0] PC, //this new PC value will be read by the Instruction Mem Register
+input Branch,
+input Zero
+);
+always@(posedge CLK)
+    begin
+    PC=0;   //this varied depending on what instruction we wanted to test
+        if(!Reset)
+            PC = 0;  //active low
+        else
+        begin
+            if(Branch == 1 && Zero ==1)
+                PC = PC  + (Instruction_SE * 4); //branch mux selector 1
+            else PC = PC + 4;  // branch mux selector 0
+            end
+        end
+endmodule
